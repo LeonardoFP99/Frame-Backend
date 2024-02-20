@@ -1,1 +1,1 @@
-Backend for a simple social media project
+API for an article publishing website.
