@@ -7,4 +7,6 @@ const findAllService = (offset, limit) =>
 
 const countArticles = () => Article.countDocuments();
 
-export { createService, findAllService, countArticles };
+const topArticleService = () => Article.findOne().sort({_id: -1}).populate("user");
+
+export { createService, findAllService, countArticles, topArticleService };
