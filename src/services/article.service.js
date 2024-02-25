@@ -9,4 +9,6 @@ const countArticles = () => Article.countDocuments();
 
 const topArticleService = () => Article.findOne().sort({_id: -1}).populate("user");
 
-export { createService, findAllService, countArticles, topArticleService };
+const findByIdService = (id) => Article.findById(id).populate("user");
+
+export { createService, findAllService, countArticles, topArticleService, findByIdService };
