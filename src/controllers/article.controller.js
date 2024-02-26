@@ -4,6 +4,7 @@ import {
   countArticles,
   topArticleService,
   findByIdService,
+  searchByTitleService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -130,4 +131,31 @@ const findById = async (req, res) => {
     }
 };
 
-export { create, findAll, topArticle, findById };
+const searchByTitle = async (req, res) => {
+    try{
+        const { title } = req.query;
+        const articles = await searchByTitleService(title);
+        if(articles.length === 0){
+            return res.status(400).send({ message: "There are no articles with this title" });
+        }
+
+        return res.status(200).send({
+            results: articles.map((item) => ({
+                id: item._id,
+                title: item.title,
+                text: item.text,
+                banner: item.banner,
+                likes: item.likes,
+                comments: item.comments,
+                name: item.user.name,
+                username: item.user.username,
+                useravatar: item.user.avatar,
+            }),
+        )});
+
+    }catch (err) {
+        return res.status(500).send({ message: err.message });
+    }
+}
+
+export { create, findAll, topArticle, findById, searchByTitle };

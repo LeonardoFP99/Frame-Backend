@@ -7,8 +7,20 @@ const findAllService = (offset, limit) =>
 
 const countArticles = () => Article.countDocuments();
 
-const topArticleService = () => Article.findOne().sort({_id: -1}).populate("user");
+const topArticleService = () =>
+  Article.findOne().sort({ _id: -1 }).populate("user");
 
 const findByIdService = (id) => Article.findById(id).populate("user");
 
-export { createService, findAllService, countArticles, topArticleService, findByIdService };
+const searchByTitleService = (title) => Article.find({
+  title: { $regex: `${title || ""}`, $options: "i" },
+}).sort({ _id: -1 }).populate("user");
+
+export {
+  createService,
+  findAllService,
+  countArticles,
+  topArticleService,
+  findByIdService,
+  searchByTitleService
+};
