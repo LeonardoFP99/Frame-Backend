@@ -5,7 +5,8 @@ import {
   topArticleService,
   findByIdService,
   searchByTitleService,
-  findByUserService
+  findByUserService,
+  updateService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -187,4 +188,35 @@ const findByUser = async (req, res) => {
   }
 };
 
-export { create, findAll, topArticle, findById, searchByTitle, findByUser };
+const update = async (req, res) => {
+  try{
+    const {title, text, banner} = req.body;
+    const {id} = req.params;
+
+    if(!title && !banner && !text) {
+      return res.status(400).send({message: "Submit at least one field to update the article"});
+    }
+
+    const article = await findByIdService(id);
+
+    if(!article.user._id.equals(req.userId)){
+      return res.status(401).send({message: "You can only update articles created by you"});
+    }
+
+    await updateService(id, title, text, banner);
+
+    return res.status(200).send({message: "Article updated"});
+  }catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+export { 
+  create, 
+  findAll, 
+  topArticle, 
+  findById, 
+  searchByTitle, 
+  findByUser, 
+  update,
+};

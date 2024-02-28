@@ -22,6 +22,13 @@ const searchByTitleService = (title) =>
 const findByUserService = (id) =>
   Article.find({ user: id }).sort({ _id: -1 }).populate("user");
 
+const updateService = (id, title, text, banner) =>
+  Article.findOneAndUpdate(
+    { _id: id },
+    { title, text, banner },
+    { rawResult: true }
+  );
+
 export {
   createService,
   findAllService,
@@ -30,4 +37,5 @@ export {
   findByIdService,
   searchByTitleService,
   findByUserService,
+  updateService,
 };
