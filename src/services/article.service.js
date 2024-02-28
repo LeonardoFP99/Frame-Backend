@@ -12,9 +12,15 @@ const topArticleService = () =>
 
 const findByIdService = (id) => Article.findById(id).populate("user");
 
-const searchByTitleService = (title) => Article.find({
-  title: { $regex: `${title || ""}`, $options: "i" },
-}).sort({ _id: -1 }).populate("user");
+const searchByTitleService = (title) =>
+  Article.find({
+    title: { $regex: `${title || ""}`, $options: "i" },
+  })
+    .sort({ _id: -1 })
+    .populate("user");
+
+const findByUserService = (id) =>
+  Article.find({ user: id }).sort({ _id: -1 }).populate("user");
 
 export {
   createService,
@@ -22,5 +28,6 @@ export {
   countArticles,
   topArticleService,
   findByIdService,
-  searchByTitleService
+  searchByTitleService,
+  findByUserService,
 };

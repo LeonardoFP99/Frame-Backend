@@ -4,7 +4,8 @@ import {
   countArticles,
   topArticleService,
   findByIdService,
-  searchByTitleService
+  searchByTitleService,
+  findByUserService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -158,4 +159,32 @@ const searchByTitle = async (req, res) => {
     }
 }
 
-export { create, findAll, topArticle, findById, searchByTitle };
+const findByUser = async (req, res) => {
+  try{
+    const id = req.userId;
+    const articles = await findByUserService(id);
+
+    if(articles.length === 0){
+      return res.status(400).send({ message: "There are no articles published by this user" });
+    }
+
+    return res.status(200).send({
+      results: articles.map((item) => ({
+        id: item._id,
+        title: item.title,
+        text: item.text,
+        banner: item.banner,
+        likes: item.likes,
+        comments: item.comments,
+        name: item.user.name,
+        username: item.user.username,
+        useravatar: item.user.avatar,
+      }),
+    )});
+
+  }catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+export { create, findAll, topArticle, findById, searchByTitle, findByUser };

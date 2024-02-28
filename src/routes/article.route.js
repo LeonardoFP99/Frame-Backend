@@ -6,6 +6,7 @@ import {
   topArticle,
   findById,
   searchByTitle,
+  findByUser,
 } from "../controllers/article.controller.js";
 
 const router = Router();
@@ -14,6 +15,7 @@ router.post("/", authMiddleware, create);
 router.get("/", findAll);
 router.get("/top", topArticle);
 router.get("/search", searchByTitle);
-router.get("/:id", findById);
+router.get("/byUser", authMiddleware, findByUser)
+router.get("/:id", authMiddleware, findById);
 
 export default router;
