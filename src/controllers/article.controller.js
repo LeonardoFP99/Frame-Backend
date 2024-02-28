@@ -6,7 +6,8 @@ import {
   findByIdService,
   searchByTitleService,
   findByUserService,
-  updateService
+  updateService,
+  eraseService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -211,6 +212,24 @@ const update = async (req, res) => {
   }
 };
 
+const erase = async (req, res) => {
+  try{
+    const {id} = req.params;
+
+    const article = await findByIdService(id);
+
+    if(!article.user._id.equals(req.userId)){
+      return res.status(401).send({message: "You can only delete articles created by you"});
+    }
+
+    await eraseService(id);
+
+    return res.status(200).send({message: "Article deleted"});
+  }catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
 export { 
   create, 
   findAll, 
@@ -219,4 +238,5 @@ export {
   searchByTitle, 
   findByUser, 
   update,
+  erase
 };
