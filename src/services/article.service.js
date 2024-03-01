@@ -31,6 +31,14 @@ const updateService = (id, title, text, banner) =>
 
 const eraseService = (id) => Article.findOneAndDelete({_id: id});
 
+const likeArticleService = (articleId, userId) => Article.findOneAndUpdate(
+  {_id : articleId, "likes.userId": {$nin: [userId]}}, {$push: {likes: {userId, created: new Date()}}}
+);
+
+const dislikeArticleService = (articleId, userId) => Article.findOneAndUpdate(
+  {_id : articleId}, {$pull: {likes: {userId}}}
+);
+
 export {
   createService,
   findAllService,
@@ -40,5 +48,7 @@ export {
   searchByTitleService,
   findByUserService,
   updateService,
-  eraseService
+  eraseService,
+  likeArticleService,
+  dislikeArticleService
 };

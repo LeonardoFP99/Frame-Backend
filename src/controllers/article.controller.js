@@ -7,7 +7,9 @@ import {
   searchByTitleService,
   findByUserService,
   updateService,
-  eraseService
+  eraseService,
+  likeArticleService,
+  dislikeArticleService,
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -113,61 +115,35 @@ const topArticle = async (req, res) => {
 };
 
 const findById = async (req, res) => {
-    try{
-        const { id } = req.params;
-        const article = await findByIdService(id);
-        return res.status(200).send({
-            article: {
-                id: article._id,
-                title: article.title,
-                text: article.text,
-                banner: article.banner,
-                likes: article.likes,
-                comments: article.comments,
-                name: article.user.name,
-                username: article.user.username,
-                useravatar: article.user.avatar,
-              },
-        });
-    }catch (err) {
-        return res.status(500).send({ message: err.message });
-    }
+  try {
+    const { id } = req.params;
+    const article = await findByIdService(id);
+    return res.status(200).send({
+      article: {
+        id: article._id,
+        title: article.title,
+        text: article.text,
+        banner: article.banner,
+        likes: article.likes,
+        comments: article.comments,
+        name: article.user.name,
+        username: article.user.username,
+        useravatar: article.user.avatar,
+      },
+    });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
 };
 
 const searchByTitle = async (req, res) => {
-    try{
-        const { title } = req.query;
-        const articles = await searchByTitleService(title);
-        if(articles.length === 0){
-            return res.status(400).send({ message: "There are no articles with this title" });
-        }
-
-        return res.status(200).send({
-            results: articles.map((item) => ({
-                id: item._id,
-                title: item.title,
-                text: item.text,
-                banner: item.banner,
-                likes: item.likes,
-                comments: item.comments,
-                name: item.user.name,
-                username: item.user.username,
-                useravatar: item.user.avatar,
-            }),
-        )});
-
-    }catch (err) {
-        return res.status(500).send({ message: err.message });
-    }
-}
-
-const findByUser = async (req, res) => {
-  try{
-    const id = req.userId;
-    const articles = await findByUserService(id);
-
-    if(articles.length === 0){
-      return res.status(400).send({ message: "There are no articles published by this user" });
+  try {
+    const { title } = req.query;
+    const articles = await searchByTitleService(title);
+    if (articles.length === 0) {
+      return res
+        .status(400)
+        .send({ message: "There are no articles with this title" });
     }
 
     return res.status(200).send({
@@ -181,62 +157,115 @@ const findByUser = async (req, res) => {
         name: item.user.name,
         username: item.user.username,
         useravatar: item.user.avatar,
-      }),
-    )});
+      })),
+    });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
 
-  }catch (err) {
+const findByUser = async (req, res) => {
+  try {
+    const id = req.userId;
+    const articles = await findByUserService(id);
+
+    if (articles.length === 0) {
+      return res
+        .status(400)
+        .send({ message: "There are no articles published by this user" });
+    }
+
+    return res.status(200).send({
+      results: articles.map((item) => ({
+        id: item._id,
+        title: item.title,
+        text: item.text,
+        banner: item.banner,
+        likes: item.likes,
+        comments: item.comments,
+        name: item.user.name,
+        username: item.user.username,
+        useravatar: item.user.avatar,
+      })),
+    });
+  } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
 
 const update = async (req, res) => {
-  try{
-    const {title, text, banner} = req.body;
-    const {id} = req.params;
+  try {
+    const { title, text, banner } = req.body;
+    const { id } = req.params;
 
-    if(!title && !banner && !text) {
-      return res.status(400).send({message: "Submit at least one field to update the article"});
+    if (!title && !banner && !text) {
+      return res
+        .status(400)
+        .send({ message: "Submit at least one field to update the article" });
     }
 
     const article = await findByIdService(id);
 
-    if(!article.user._id.equals(req.userId)){
-      return res.status(401).send({message: "You can only update articles created by you"});
+    if (!article.user._id.equals(req.userId)) {
+      return res
+        .status(401)
+        .send({ message: "You can only update articles created by you" });
     }
 
     await updateService(id, title, text, banner);
 
-    return res.status(200).send({message: "Article updated"});
-  }catch (err) {
+    return res.status(200).send({ message: "Article updated" });
+  } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
 
 const erase = async (req, res) => {
-  try{
-    const {id} = req.params;
+  try {
+    const { id } = req.params;
 
     const article = await findByIdService(id);
 
-    if(!article.user._id.equals(req.userId)){
-      return res.status(401).send({message: "You can only delete articles created by you"});
+    if (!article.user._id.equals(req.userId)) {
+      return res
+        .status(401)
+        .send({ message: "You can only delete articles created by you" });
     }
 
     await eraseService(id);
 
-    return res.status(200).send({message: "Article deleted"});
-  }catch (err) {
+    return res.status(200).send({ message: "Article deleted" });
+  } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
 
-export { 
-  create, 
-  findAll, 
-  topArticle, 
-  findById, 
-  searchByTitle, 
-  findByUser, 
+const likeArticle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    const articleLiked = await likeArticleService(id, userId);
+
+    if (!articleLiked) {
+      await dislikeArticleService(id, userId);
+      return res.status(200).send({ message: "Like removed" });
+    }
+
+    return res.status(200).send({ message: "Article liked" });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+export {
+  create,
+  findAll,
+  topArticle,
+  findById,
+  searchByTitle,
+  findByUser,
   update,
-  erase
+  erase,
+  likeArticle,
 };

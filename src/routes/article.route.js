@@ -8,7 +8,8 @@ import {
   searchByTitle,
   findByUser,
   update,
-  erase
+  erase,
+  likeArticle
 } from "../controllers/article.controller.js";
 
 const router = Router();
@@ -21,5 +22,6 @@ router.get("/byUser", authMiddleware, findByUser)
 router.get("/:id", authMiddleware, findById);
 router.patch("/:id", authMiddleware, update);
 router.delete("/:id", authMiddleware, erase);
+router.patch("/like/:id", authMiddleware, likeArticle);
 
 export default router;
