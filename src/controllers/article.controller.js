@@ -10,6 +10,7 @@ import {
   eraseService,
   likeArticleService,
   dislikeArticleService,
+  addCommentService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -258,6 +259,23 @@ const likeArticle = async (req, res) => {
   }
 };
 
+const addComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    const comment = req.body.comment;
+
+    if(!comment){
+      return res.status(400).send({message: "Missing comment text"});
+    }
+
+    await addCommentService(id, comment, userId);
+    return res.status(200).send({message: "Comment sent"});
+  }catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
 export {
   create,
   findAll,
@@ -268,4 +286,5 @@ export {
   update,
   erase,
   likeArticle,
+  addComment
 };

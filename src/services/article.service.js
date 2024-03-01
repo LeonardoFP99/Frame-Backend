@@ -32,12 +32,22 @@ const updateService = (id, title, text, banner) =>
 const eraseService = (id) => Article.findOneAndDelete({_id: id});
 
 const likeArticleService = (articleId, userId) => Article.findOneAndUpdate(
-  {_id : articleId, "likes.userId": {$nin: [userId]}}, {$push: {likes: {userId, created: new Date()}}}
+  {_id : articleId, "likes.userId": {$nin: [userId]}}, {$push: {likes: {userId, createdAt: new Date()}}}
 );
 
 const dislikeArticleService = (articleId, userId) => Article.findOneAndUpdate(
   {_id : articleId}, {$pull: {likes: {userId}}}
 );
+
+const addCommentService = (articleId, comment, userId) => {
+  const idComment = Math.floor(Date.now() * Math.random()).toString(36);
+  return Article.findOneAndUpdate(
+    {_id: articleId},
+    {$push: {comments: {
+      idComment, userId, comment, createdAt: new Date()
+    }}}
+  );
+};
 
 export {
   createService,
@@ -50,5 +60,6 @@ export {
   updateService,
   eraseService,
   likeArticleService,
-  dislikeArticleService
+  dislikeArticleService,
+  addCommentService
 };

@@ -9,7 +9,8 @@ import {
   findByUser,
   update,
   erase,
-  likeArticle
+  likeArticle,
+  addComment
 } from "../controllers/article.controller.js";
 
 const router = Router();
@@ -23,5 +24,6 @@ router.get("/:id", authMiddleware, findById);
 router.patch("/:id", authMiddleware, update);
 router.delete("/:id", authMiddleware, erase);
 router.patch("/like/:id", authMiddleware, likeArticle);
+router.patch("/comment/:id", authMiddleware, addComment);
 
 export default router;
