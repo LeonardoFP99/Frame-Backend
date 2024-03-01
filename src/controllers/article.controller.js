@@ -10,7 +10,8 @@ import {
   eraseService,
   likeArticleService,
   dislikeArticleService,
-  addCommentService
+  addCommentService,
+  deleteCommentService
 } from "../services/article.service.js";
 
 const create = async (req, res) => {
@@ -263,7 +264,7 @@ const addComment = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.userId;
-    const comment = req.body.comment;
+    const { comment } = req.body;
 
     if(!comment){
       return res.status(400).send({message: "Missing comment text"});
@@ -271,6 +272,34 @@ const addComment = async (req, res) => {
 
     await addCommentService(id, comment, userId);
     return res.status(200).send({message: "Comment sent"});
+  }catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+const deleteComment = async (req, res) => {
+  try{
+    const { idArticle, idComment } = req.params;
+    const userId = req.userId;
+
+    const removedComment = await deleteCommentService(idArticle, idComment, userId);
+
+    const commentFinder = removedComment.comments.find(
+      comment => comment.idComment === idComment
+    );
+
+    console.log(commentFinder.idComment);
+    console.log(idComment);
+
+    if (!commentFinder) {
+      return res.status(404).send({message: "Comment not found"});
+    }
+
+    if(!commentFinder.userId.equals(userId)){
+      return res.status(400).send({message: "You can only delete your comments"});
+    }
+
+    return res.status(200).send({message: "Comment removed"});
   }catch (err) {
     return res.status(500).send({ message: err.message });
   }
@@ -286,5 +315,6 @@ export {
   update,
   erase,
   likeArticle,
-  addComment
+  addComment,
+  deleteComment
 };

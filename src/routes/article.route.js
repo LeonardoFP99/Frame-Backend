@@ -10,7 +10,8 @@ import {
   update,
   erase,
   likeArticle,
-  addComment
+  addComment,
+  deleteComment
 } from "../controllers/article.controller.js";
 
 const router = Router();
@@ -25,5 +26,6 @@ router.patch("/:id", authMiddleware, update);
 router.delete("/:id", authMiddleware, erase);
 router.patch("/like/:id", authMiddleware, likeArticle);
 router.patch("/comment/:id", authMiddleware, addComment);
+router.patch("/comment/:idArticle/:idComment", authMiddleware, deleteComment);
 
 export default router;

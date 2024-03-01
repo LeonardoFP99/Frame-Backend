@@ -49,6 +49,10 @@ const addCommentService = (articleId, comment, userId) => {
   );
 };
 
+const deleteCommentService = (articleId, commentId, userId) => Article.findOneAndUpdate(
+  {_id: articleId}, {$pull: {comments: {idComment: commentId, userId: userId}}}
+);
+
 export {
   createService,
   findAllService,
@@ -61,5 +65,6 @@ export {
   eraseService,
   likeArticleService,
   dislikeArticleService,
-  addCommentService
+  addCommentService,
+  deleteCommentService
 };
